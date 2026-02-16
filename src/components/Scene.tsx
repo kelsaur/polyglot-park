@@ -1,14 +1,31 @@
 import { Canvas } from "@react-three/fiber";
 import { ContactShadows } from "@react-three/drei";
 import type { JSX } from "react";
+import { useGLTF } from "@react-three/drei";
+import { Environment } from "@react-three/drei";
+import { OrbitControls } from "@react-three/drei";
 
-function Ground(): JSX.Element {
+{
+  /*function Ground(): JSX.Element {
   return (
     <mesh rotation-x={-Math.PI / 2} position={[0, 0, 0]}>
       <planeGeometry args={[50, 50]} />
       <meshStandardMaterial color="lightgreen" />
     </mesh>
   );
+}*/
+}
+
+function TestScene() {
+  const { scene } = useGLTF("/models/testscene2.glb");
+  console.log(scene);
+  return <primitive object={scene} />;
+}
+
+function Stone() {
+  const { scene } = useGLTF("/models/stone.glb");
+  console.log(scene);
+  return <primitive object={scene} />;
 }
 
 export default function Scene(): JSX.Element {
@@ -17,12 +34,23 @@ export default function Scene(): JSX.Element {
       camera={{ position: [0, 4, 10], fov: 50 }}
       style={{ height: "100vh", width: "100vw" }}
     >
+      <OrbitControls
+        makeDefault
+        enableDamping
+        dampingFactor={0.08}
+        maxPolarAngle={Math.PI / 2.05}
+      />
+
       {/* lighting */}
-      <ambientLight intensity={0.4} />
+      <ambientLight intensity={1} />
       <directionalLight intensity={1} position={[5, 10, 5]} />
 
+      <Environment files="/hdri/env.hdr" background />
+
       {/* ground */}
-      <Ground />
+      {/*<Ground />*/}
+      <TestScene />
+      <Stone />
 
       {/* cube */}
       <mesh position={[0, 1, 0]}>
