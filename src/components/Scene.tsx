@@ -17,40 +17,54 @@ import { OrbitControls } from "@react-three/drei";
 }
 
 function TestScene() {
-  const { scene } = useGLTF("/models/testscene2.glb");
+  const { scene } = useGLTF("/models/testscene3.glb");
   console.log(scene);
   return <primitive object={scene} />;
 }
 
-function Stone() {
+/*function Stone() {
   const { scene } = useGLTF("/models/stone.glb");
   console.log(scene);
   return <primitive object={scene} />;
-}
+}*/
+
+const basePolar = Math.PI / 2 - 0.1;
+const wiggle = Math.PI / 30;
 
 export default function Scene(): JSX.Element {
   return (
     <Canvas
-      camera={{ position: [0, 4, 10], fov: 50 }}
+      frameloop="always"
+      camera={{ position: [0, 2, 8], fov: 40 }}
+      onCreated={({ camera }) => camera.lookAt(0, 1, 0)}
       style={{ height: "100vh", width: "100vw" }}
     >
       <OrbitControls
         makeDefault
         enableDamping
-        dampingFactor={0.08}
-        maxPolarAngle={Math.PI / 2.05}
+        dampingFactor={0.15}
+        rotateSpeed={0.6}
+        enablePan={false}
+        enableZoom={false}
+        target={[0, 4, 0]}
+        //vertical limits (up/down)
+        minPolarAngle={basePolar - wiggle}
+        maxPolarAngle={basePolar + wiggle}
+        //horizontal limits (left/right)
+        minAzimuthAngle={-Math.PI / 30}
+        maxAzimuthAngle={Math.PI / 30}
       />
 
       {/* lighting */}
       <ambientLight intensity={1} />
       <directionalLight intensity={1} position={[5, 10, 5]} />
 
-      <Environment files="/hdri/env.hdr" background />
+      <Environment files="/hdri/env3.hdr" background />
 
       {/* ground */}
       {/*<Ground />*/}
       <TestScene />
-      <Stone />
+      {/*<Stone />*/}
 
       {/* cube */}
       <mesh position={[0, 1, 0]}>
@@ -63,9 +77,9 @@ export default function Scene(): JSX.Element {
         position={[0, 0, 0]}
         opacity={0.5}
         scale={5}
-        blur={5}
+        blur={3}
         far={20}
-        resolution={512}
+        resolution={256}
       />
     </Canvas>
   );
