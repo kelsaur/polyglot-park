@@ -1,86 +1,126 @@
-import { Canvas } from "@react-three/fiber";
-import { ContactShadows } from "@react-three/drei";
+import * as THREE from "three";
+import { Canvas, useFrame } from "@react-three/fiber";
+import { Environment, OrbitControls, useGLTF } from "@react-three/drei";
 import type { JSX } from "react";
-import { useGLTF } from "@react-three/drei";
-import { Environment } from "@react-three/drei";
-import { OrbitControls } from "@react-three/drei";
+import { useRef } from "react";
 
-{
-  /*function Ground(): JSX.Element {
-  return (
-    <mesh rotation-x={-Math.PI / 2} position={[0, 0, 0]}>
-      <planeGeometry args={[50, 50]} />
-      <meshStandardMaterial color="lightgreen" />
-    </mesh>
-  );
-}*/
-}
-
-function TestScene() {
-  const { scene } = useGLTF("/models/testscene3.glb");
-  console.log(scene);
+function ParkScene() {
+  const { scene } = useGLTF("/models/parkscene.glb");
   return <primitive object={scene} />;
 }
 
-/*function Stone() {
+function Bench() {
+  const { scene } = useGLTF("/models/bench.glb");
+  return <primitive object={scene} />;
+}
+
+function Canoe() {
+  const { scene } = useGLTF("/models/canoe.glb");
+  return <primitive object={scene} />;
+}
+
+function Fence() {
+  const { scene } = useGLTF("/models/fence.glb");
+  return <primitive object={scene} />;
+}
+
+function Flowers() {
+  const { scene } = useGLTF("/models/flowers.glb");
+  return <primitive object={scene} />;
+}
+
+function Lake() {
+  const { scene } = useGLTF("/models/lake.glb");
+  return <primitive object={scene} />;
+}
+
+function Mushrooms() {
+  const { scene } = useGLTF("/models/mushrooms.glb");
+  return <primitive object={scene} />;
+}
+
+function Stone() {
   const { scene } = useGLTF("/models/stone.glb");
-  console.log(scene);
   return <primitive object={scene} />;
-}*/
+}
 
-const basePolar = Math.PI / 2 - 0.1;
-const wiggle = Math.PI / 30;
+function Tree() {
+  const { scene } = useGLTF("/models/tree.glb");
+  return <primitive object={scene} />;
+}
+
+function Clouds({
+  path,
+  position,
+  offset = 0,
+}: {
+  path: string;
+  position: [number, number, number];
+  offset?: number;
+}) {
+  const ref = useRef<THREE.Group>(null);
+  const { scene } = useGLTF(path);
+
+  useFrame(({ clock }) => {
+    if (!ref.current) return;
+    ref.current.position.y =
+      position[1] + Math.sin(clock.getElapsedTime() + offset) * 0.3;
+  });
+
+  return <primitive ref={ref} object={scene.clone()} position={position} />;
+}
 
 export default function Scene(): JSX.Element {
   return (
     <Canvas
-      frameloop="always"
-      camera={{ position: [0, 2, 8], fov: 40 }}
-      onCreated={({ camera }) => camera.lookAt(0, 1, 0)}
-      style={{ height: "100vh", width: "100vw" }}
+      onCreated={({ scene }) => {
+        scene.environmentIntensity = 0.5;
+      }}
+      orthographic
+      camera={{
+        position: [10, 10, 10],
+        zoom: 60,
+        near: 0.1,
+        far: 1000,
+      }}
+      style={{ height: "100vh", width: "100vw", background: "#a8c6d8" }}
     >
       <OrbitControls
-        makeDefault
-        enableDamping
-        dampingFactor={0.15}
-        rotateSpeed={0.6}
+        target={[0.05, 1, 0]}
+        enableRotate={true}
+        enableZoom={true}
         enablePan={false}
-        enableZoom={false}
-        target={[0, 4, 0]}
-        //vertical limits (up/down)
-        minPolarAngle={basePolar - wiggle}
-        maxPolarAngle={basePolar + wiggle}
-        //horizontal limits (left/right)
-        minAzimuthAngle={-Math.PI / 30}
-        maxAzimuthAngle={Math.PI / 30}
+        minPolarAngle={Math.PI / 6}
+        maxPolarAngle={Math.PI / 2.5}
       />
 
       {/* lighting */}
-      <ambientLight intensity={1} />
-      <directionalLight intensity={1} position={[5, 10, 5]} />
+      <ambientLight intensity={0.5} />
+      {/*<directionalLight intensity={2} position={[10, 20, 10]} castShadow />*/}
 
-      <Environment files="/hdri/env3.hdr" background />
+      <Environment files="/hdri/env3.hdr" />
+      {/*<pointLight position={[-1, 0, -2]} intensity={5} color="#ff0000" />
 
-      {/* ground */}
-      {/*<Ground />*/}
-      <TestScene />
-      {/*<Stone />*/}
+      <mesh position={[-1, 0, -2]}>
+        <sphereGeometry args={[0.1]} />
+        <meshBasicMaterial color="yellow" />
+      </mesh>*/}
 
-      {/* cube */}
-      <mesh position={[0, 1, 0]}>
-        <boxGeometry args={[1, 1, 1]} />
-        <meshStandardMaterial color="brown" />
-      </mesh>
-
-      {/* contact shadow under the object */}
-      <ContactShadows
-        position={[0, 0, 0]}
-        opacity={0.5}
-        scale={5}
-        blur={3}
-        far={20}
-        resolution={256}
-      />
+      {/* models */}
+      <ParkScene />
+      <Bench />
+      <Canoe />
+      <Fence />
+      <Flowers />
+      <Lake />
+      <Mushrooms />
+      <Stone />
+      <Tree />
+      <Clouds path="/models/cloud1.glb" position={[3, 3, -3]} offset={0} />
+      <Clouds path="/models/cloud2.glb" position={[-1, 5, 5]} offset={2} />
+      <Clouds path="/models/cloud3.glb" position={[-3, 2, -6]} offset={3} />
+      <Clouds path="/models/cloud1.glb" position={[-3, 4, -1]} offset={1} />
+      <Clouds path="/models/cloud2.glb" position={[0, 7, 0]} offset={4} />
     </Canvas>
   );
 }
