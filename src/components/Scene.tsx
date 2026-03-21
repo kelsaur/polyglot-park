@@ -3,7 +3,7 @@ import { Canvas, useFrame } from "@react-three/fiber";
 import { Environment, OrbitControls, useGLTF } from "@react-three/drei";
 import type { JSX } from "react";
 import type { OrbitControls as OrbitControlsImpl } from "three-stdlib";
-import { useRef } from "react";
+import { useRef, useEffect, useState } from "react";
 
 function ParkScene() {
   const { scene } = useGLTF("/models/parkscene.glb");
@@ -12,7 +12,58 @@ function ParkScene() {
 
 function Bench() {
   const { scene } = useGLTF("/models/bench.glb");
-  return <primitive object={scene} />;
+  const ref = useRef<THREE.Group>(null);
+  const [hovered, setHovered] = useState(false);
+
+  //set emissive to 0 on mount so it doesn't flash
+  useEffect(() => {
+    scene.traverse((child) => {
+      if (child instanceof THREE.Mesh) {
+        child.material.emissive = new THREE.Color("#ffffff");
+        child.material.emissiveIntensity = 0;
+      }
+    });
+  }, [scene]);
+
+  //cursor pointer
+  useEffect(() => {
+    document.body.style.cursor = hovered ? "pointer" : "auto";
+    return () => {
+      document.body.style.cursor = "auto";
+    };
+  }, [hovered]);
+
+  //smooth scale + emissive on hover
+  useFrame(() => {
+    if (!ref.current) return;
+
+    //scale up/down
+    const targetScale = hovered ? 1.08 : 1.0;
+    ref.current.scale.lerp(
+      new THREE.Vector3(targetScale, targetScale, targetScale),
+      0.1,
+    );
+
+    //change emissive
+    ref.current.traverse((child) => {
+      if (child instanceof THREE.Mesh) {
+        const targetIntensity = hovered ? 0.2 : 0;
+        child.material.emissiveIntensity +=
+          (targetIntensity - child.material.emissiveIntensity) * 0.1;
+        child.material.emissive = new THREE.Color("#ffffff");
+      }
+    });
+  });
+
+  return (
+    <group
+      ref={ref}
+      onPointerOver={() => setHovered(true)}
+      onPointerOut={() => setHovered(false)}
+    >
+      <primitive object={scene} />
+    </group>
+  );
 }
 
 function Canoe() {
