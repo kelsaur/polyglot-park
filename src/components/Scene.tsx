@@ -3,7 +3,7 @@ import { Canvas, useFrame } from "@react-three/fiber";
 import { Environment, OrbitControls, useGLTF } from "@react-three/drei";
 import type { JSX } from "react";
 import type { OrbitControls as OrbitControlsImpl } from "three-stdlib";
-import { useRef } from "react";
+import { useRef, useEffect, useState } from "react";
 
 function ParkScene() {
   const { scene } = useGLTF("/models/parkscene.glb");
@@ -131,6 +131,89 @@ function ClickToFocus({
   );
 }
 
+function HoverMesh({
+  children,
+  hitPadding = 0.3,
+}: {
+  children: React.ReactNode;
+  hitPadding?: number;
+}) {
+  const ref = useRef<THREE.Group>(null);
+  const hitRef = useRef<THREE.Mesh>(null);
+  const [hovered, setHovered] = useState(false);
+
+  //set emissive to 0 on mount so it doesn't flash
+  useEffect(() => {
+    if (!ref.current) return;
+    ref.current.traverse((child) => {
+      if (child instanceof THREE.Mesh) {
+        child.material.emissive = new THREE.Color("#ffffff");
+        child.material.emissiveIntensity = 0;
+      }
+    });
+  }, []);
+
+  //resize hitbox to match model bounds + padding
+  useEffect(() => {
+    if (!ref.current || !hitRef.current) return;
+    const box = new THREE.Box3().setFromObject(ref.current);
+    const size = box.getSize(new THREE.Vector3());
+    const center = box.getCenter(new THREE.Vector3());
+    hitRef.current.scale.set(
+      size.x + hitPadding,
+      size.y + hitPadding,
+      size.z + hitPadding,
+    );
+    hitRef.current.position.copy(center);
+  }, [hitPadding]);
+
+  //cursor pointer
+  useEffect(() => {
+    document.body.style.cursor = hovered ? "pointer" : "auto";
+    return () => {
+      document.body.style.cursor = "auto";
+    };
+  }, [hovered]);
+
+  //smooth scale + emissive
+  useFrame(() => {
+    if (!ref.current) return;
+
+    const targetScale = hovered ? 1.1 : 1.0;
+    ref.current.scale.lerp(
+      new THREE.Vector3(targetScale, targetScale, targetScale),
+      0.05,
+    );
+
+    ref.current.traverse((child) => {
+      if (child instanceof THREE.Mesh) {
+        const targetIntensity = hovered ? 0.1 : 0;
+        child.material.emissive = new THREE.Color("#ffffff");
+        child.material.emissiveIntensity +=
+          (targetIntensity - child.material.emissiveIntensity) * 0.1;
+      }
+    });
+  });
+
+  return (
+    <group>
+      {/* invisible hitbox a little bigger than model */}
+      <mesh
+        ref={hitRef}
+        visible={false}
+        onPointerOver={() => setHovered(true)}
+        onPointerOut={() => setHovered(false)}
+      >
+        <boxGeometry args={[1, 1, 1]} />
+        <meshBasicMaterial transparent opacity={0} />
+      </mesh>
+
+      {/* actual model */}
+      <group ref={ref}>{children}</group>
+    </group>
+  );
+}
+
 export default function Scene(): JSX.Element {
   const controlsRef = useRef<OrbitControlsImpl>(null);
 
@@ -206,14 +289,28 @@ export default function Scene(): JSX.Element {
 
       {/* models */}
       <ParkScene />
-      <Bench />
-      <Canoe />
-      <Fence />
-      <Flowers />
+      <HoverMesh>
+        <Bench />
+      </HoverMesh>
+      <HoverMesh>
+        <Canoe />
+      </HoverMesh>
+      <HoverMesh>
+        <Fence />
+      </HoverMesh>
+      <HoverMesh>
+        <Flowers />
+      </HoverMesh>
       <Lake />
-      <Mushrooms />
-      <Stone />
-      <Tree />
+      <HoverMesh>
+        <Mushrooms />
+      </HoverMesh>
+      <HoverMesh>
+        <Stone />
+      </HoverMesh>
+      <HoverMesh>
+        <Tree />
+      </HoverMesh>
       <Clouds path="/models/cloud1.glb" position={[3, 5, -3]} offset={0} />
       <Clouds
         path="/models/cloud2.glb"
