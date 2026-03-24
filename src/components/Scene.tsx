@@ -4,6 +4,38 @@ import { Environment, OrbitControls, useGLTF } from "@react-three/drei";
 import type { JSX } from "react";
 import type { OrbitControls as OrbitControlsImpl } from "three-stdlib";
 import { useRef, useEffect, useState } from "react";
+import "../Scene.css";
+
+const VOCABULARY: Record<string, { estonian: string; english: string }> = {
+  bench: {
+    estonian: "pink",
+    english: "bench",
+  },
+  canoe: {
+    estonian: "kanuu",
+    english: "canoe",
+  },
+  flowers: {
+    estonian: "lilled",
+    english: "flowers",
+  },
+  mushrooms: {
+    estonian: "seened",
+    english: "mushrooms",
+  },
+  stone: {
+    estonian: "kivi",
+    english: "stone",
+  },
+  tree: {
+    estonian: "puu",
+    english: "tree",
+  },
+  fence: {
+    estonian: "aed",
+    english: "fence",
+  },
+};
 
 function ParkScene() {
   const { scene } = useGLTF("/models/parkscene.glb");
@@ -134,9 +166,13 @@ function ClickToFocus({
 function HoverMesh({
   children,
   hitPadding = 0.3,
+  word,
+  onSelect,
 }: {
   children: React.ReactNode;
   hitPadding?: number;
+  word: string;
+  onSelect: (word: string) => void;
 }) {
   const ref = useRef<THREE.Group>(null);
   const hitRef = useRef<THREE.Mesh>(null);
@@ -203,6 +239,11 @@ function HoverMesh({
         visible={false}
         onPointerOver={() => setHovered(true)}
         onPointerOut={() => setHovered(false)}
+        onPointerUp={(e) => e.stopPropagation()}
+        onClick={(e) => {
+          e.stopPropagation(); //stops click reaching ClickToFocus plane below
+          onSelect(word);
+        }}
       >
         <boxGeometry args={[1, 1, 1]} />
         <meshBasicMaterial transparent opacity={0} />
@@ -214,119 +255,149 @@ function HoverMesh({
   );
 }
 
-export default function Scene(): JSX.Element {
-  const controlsRef = useRef<OrbitControlsImpl>(null);
+//word overlay shown when user clicks an object
+function WordOverlay({ word, onClose }: { word: string; onClose: () => void }) {
+  const entry = VOCABULARY[word];
+  if (!entry) return null;
 
   return (
-    <Canvas
-      onCreated={({ scene }) => {
-        scene.environmentIntensity = 0.5;
-        scene.environmentRotation.y = Math.PI / 5;
-      }}
-      orthographic
-      camera={{
-        position: [10, 10, 10],
-        zoom: 60,
-        near: 0.1,
-        far: 1000,
-      }}
-      style={{ height: "100vh", width: "100vw", background: "#a8c6d8" }}
-    >
-      <OrbitControls
-        ref={controlsRef}
-        target={[0.05, 2, 0]}
-        enableRotate={true}
-        enableZoom={true}
-        enablePan={true}
-        minPolarAngle={Math.PI / 6}
-        maxPolarAngle={Math.PI / 2.5}
-      />
+    <div className="overlay-backdrop" onClick={onClose}>
+      <div className="overlay-card" onClick={(e) => e.stopPropagation()}>
+        <p className="overlay-estonian">{entry.estonian}</p>
+        <p className="overlay-english">{entry.english}</p>
+        <button className="overlay-close" onClick={onClose}>
+          close
+        </button>
+      </div>
+    </div>
+  );
+}
 
-      <ClickToFocus controlsRef={controlsRef} />
+export default function Scene(): JSX.Element {
+  const controlsRef = useRef<OrbitControlsImpl>(null);
+  const [selected, setSelected] = useState<string | null>(null);
 
-      {/* lighting */}
-      <ambientLight intensity={0.5} />
-      {/*<directionalLight intensity={2} position={[10, 20, 10]} castShadow />*/}
+  return (
+    <div className="scene-wrapper">
+      <Canvas
+        className="scene-canvas"
+        onCreated={({ scene }) => {
+          scene.environmentIntensity = 0.5;
+          scene.environmentRotation.y = Math.PI / 5;
+        }}
+        orthographic
+        camera={{
+          position: [10, 10, 10],
+          zoom: 60,
+          near: 0.1,
+          far: 1000,
+        }}
+      >
+        <OrbitControls
+          ref={controlsRef}
+          target={[0.05, 2, 0]}
+          enableRotate={true}
+          enableZoom={true}
+          enablePan={true}
+          minPolarAngle={Math.PI / 6}
+          maxPolarAngle={Math.PI / 2.5}
+        />
 
-      <Environment files="/hdri/env3.hdr" />
-      {/* Point light 1 - trees back*/}
-      <pointLight
-        position={[-0.7, 0.5, -2]}
-        intensity={1}
-        color="#ff5500"
-        decay={3}
-      />
+        <ClickToFocus controlsRef={controlsRef} />
 
-      {/*<mesh position={[-0.7, 0.5, -2]}>
+        {/* lighting */}
+        <ambientLight intensity={0.5} />
+        {/*<directionalLight intensity={2} position={[10, 20, 10]} castShadow />*/}
+
+        <Environment files="/hdri/env3.hdr" />
+        {/* Point light 1 - trees back*/}
+        <pointLight
+          position={[-0.7, 0.5, -2]}
+          intensity={1}
+          color="#ff5500"
+          decay={3}
+        />
+
+        {/*<mesh position={[-0.7, 0.5, -2]}>
         <sphereGeometry args={[0.1]} />
         <meshBasicMaterial color="yellow" />
       </mesh>*/}
 
-      {/* Point light 2 - left grass*/}
-      <pointLight
-        position={[-3, 0.3, 2.7]}
-        intensity={0.5}
-        color="#ffcc88"
-        decay={2}
-      />
+        {/* Point light 2 - left grass*/}
+        <pointLight
+          position={[-3, 0.3, 2.7]}
+          intensity={0.5}
+          color="#ffcc88"
+          decay={2}
+        />
 
-      {/* Point light 3 - lake*/}
-      <pointLight
-        position={[1.5, 0.2, -0.2]}
-        intensity={0.8}
-        color="#aaddff"
-        decay={0.5}
-        distance={5}
-      />
+        {/* Point light 3 - lake*/}
+        <pointLight
+          position={[1.5, 0.2, -0.2]}
+          intensity={0.8}
+          color="#aaddff"
+          decay={0.5}
+          distance={5}
+        />
 
-      {/* Point light 4 - flowers front*/}
-      <pointLight
-        position={[3, 0.4, 3]}
-        intensity={0.5}
-        color="#ff6135"
-        decay={2}
-      />
+        {/* Point light 4 - flowers front*/}
+        <pointLight
+          position={[3, 0.4, 3]}
+          intensity={0.5}
+          color="#ff6135"
+          decay={2}
+        />
 
-      {/* models */}
-      <ParkScene />
-      <HoverMesh>
-        <Bench />
-      </HoverMesh>
-      <HoverMesh>
-        <Canoe />
-      </HoverMesh>
-      <HoverMesh>
-        <Fence />
-      </HoverMesh>
-      <HoverMesh>
-        <Flowers />
-      </HoverMesh>
-      <Lake />
-      <HoverMesh>
-        <Mushrooms />
-      </HoverMesh>
-      <HoverMesh>
-        <Stone />
-      </HoverMesh>
-      <HoverMesh>
-        <Tree />
-      </HoverMesh>
-      <Clouds path="/models/cloud1.glb" position={[3, 5, -3]} offset={0} />
-      <Clouds
-        path="/models/cloud2.glb"
-        position={[-1, 7, 5]}
-        offset={2}
-        rotation={[0, Math.PI / 8, 0]}
-      />
-      <Clouds
-        path="/models/cloud3.glb"
-        position={[-3, 4, -3]}
-        offset={3}
-        rotation={[0, Math.PI / -6, 0]}
-      />
-      <Clouds path="/models/cloud3.glb" position={[0, 9, 0]} offset={4} />
-      <Clouds path="/models/cloud1.glb" position={[0, 10, 5]} offset={3.4} />
-      <Clouds path="/models/cloud2.glb" position={[3, 6.6, -1]} offset={0.5} />
-    </Canvas>
+        {/* models */}
+        <ParkScene />
+        <HoverMesh word="bench" onSelect={setSelected}>
+          <Bench />
+        </HoverMesh>
+        <HoverMesh word="canoe" onSelect={setSelected}>
+          <Canoe />
+        </HoverMesh>
+        <HoverMesh word="fence" onSelect={setSelected}>
+          <Fence />
+        </HoverMesh>
+        <HoverMesh word="flowers" onSelect={setSelected}>
+          <Flowers />
+        </HoverMesh>
+        <Lake />
+        <HoverMesh word="mushrooms" onSelect={setSelected}>
+          <Mushrooms />
+        </HoverMesh>
+        <HoverMesh word="stone" onSelect={setSelected}>
+          <Stone />
+        </HoverMesh>
+        <HoverMesh word="tree" onSelect={setSelected}>
+          <Tree />
+        </HoverMesh>
+        <Clouds path="/models/cloud1.glb" position={[3, 5, -3]} offset={0} />
+        <Clouds
+          path="/models/cloud2.glb"
+          position={[-1, 7, 5]}
+          offset={2}
+          rotation={[0, Math.PI / 8, 0]}
+        />
+        <Clouds
+          path="/models/cloud3.glb"
+          position={[-3, 4, -3]}
+          offset={3}
+          rotation={[0, Math.PI / -6, 0]}
+        />
+        <Clouds path="/models/cloud3.glb" position={[0, 9, 0]} offset={4} />
+        <Clouds path="/models/cloud1.glb" position={[0, 10, 5]} offset={3.4} />
+        <Clouds
+          path="/models/cloud2.glb"
+          position={[3, 6.6, -1]}
+          offset={0.5}
+        />
+      </Canvas>
+
+      {/* word overlaym*/}
+      {selected && (
+        <WordOverlay word={selected} onClose={() => setSelected(null)} />
+      )}
+    </div>
   );
 }
