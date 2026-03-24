@@ -5,6 +5,16 @@ import type { JSX } from "react";
 import type { OrbitControls as OrbitControlsImpl } from "three-stdlib";
 import { useRef, useEffect, useState } from "react";
 
+const VOCABULARY: Record<string, { estonian: string; english: string }> = {
+  bench: { estonian: "pink", english: "bench" },
+  canoe: { estonian: "kanuu", english: "canoe" },
+  flowers: { estonian: "lilled", english: "flowers" },
+  mushrooms: { estonian: "seened", english: "mushrooms" },
+  stone: { estonian: "kivi", english: "stone" },
+  tree: { estonian: "puu", english: "tree" },
+  fence: { estonian: "aed", english: "fence" },
+};
+
 function ParkScene() {
   const { scene } = useGLTF("/models/parkscene.glb");
   return <primitive object={scene} />;
@@ -134,9 +144,13 @@ function ClickToFocus({
 function HoverMesh({
   children,
   hitPadding = 0.3,
+  word,
+  onSelect,
 }: {
   children: React.ReactNode;
   hitPadding?: number;
+  word: string;
+  onSelect: (word: string) => void;
 }) {
   const ref = useRef<THREE.Group>(null);
   const hitRef = useRef<THREE.Mesh>(null);
@@ -203,6 +217,11 @@ function HoverMesh({
         visible={false}
         onPointerOver={() => setHovered(true)}
         onPointerOut={() => setHovered(false)}
+        onPointerUp={(e) => e.stopPropagation()}
+        onClick={(e) => {
+          e.stopPropagation(); //stops click reaching ClickToFocus plane below
+          onSelect(word);
+        }}
       >
         <boxGeometry args={[1, 1, 1]} />
         <meshBasicMaterial transparent opacity={0} />
@@ -216,6 +235,11 @@ function HoverMesh({
 
 export default function Scene(): JSX.Element {
   const controlsRef = useRef<OrbitControlsImpl>(null);
+
+  //log mesh name user clicked
+  function handleSelect(word: string) {
+    console.log("clicked:", word, "->", VOCABULARY[word].estonian);
+  }
 
   return (
     <Canvas
@@ -289,26 +313,26 @@ export default function Scene(): JSX.Element {
 
       {/* models */}
       <ParkScene />
-      <HoverMesh>
+      <HoverMesh word="bench" onSelect={handleSelect}>
         <Bench />
       </HoverMesh>
-      <HoverMesh>
+      <HoverMesh word="canoe" onSelect={handleSelect}>
         <Canoe />
       </HoverMesh>
-      <HoverMesh>
+      <HoverMesh word="fence" onSelect={handleSelect}>
         <Fence />
       </HoverMesh>
-      <HoverMesh>
+      <HoverMesh word="flowers" onSelect={handleSelect}>
         <Flowers />
       </HoverMesh>
       <Lake />
-      <HoverMesh>
+      <HoverMesh word="mushrooms" onSelect={handleSelect}>
         <Mushrooms />
       </HoverMesh>
-      <HoverMesh>
+      <HoverMesh word="stone" onSelect={handleSelect}>
         <Stone />
       </HoverMesh>
-      <HoverMesh>
+      <HoverMesh word="tree" onSelect={handleSelect}>
         <Tree />
       </HoverMesh>
       <Clouds path="/models/cloud1.glb" position={[3, 5, -3]} offset={0} />
