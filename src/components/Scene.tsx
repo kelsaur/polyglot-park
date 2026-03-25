@@ -6,34 +6,44 @@ import type { OrbitControls as OrbitControlsImpl } from "three-stdlib";
 import { useRef, useEffect, useState } from "react";
 import "../Scene.css";
 
-const VOCABULARY: Record<string, { estonian: string; english: string }> = {
+const VOCABULARY: Record<
+  string,
+  { estonian: string; english: string; audio?: string }
+> = {
   bench: {
     estonian: "pink",
     english: "bench",
+    audio: "/audio/pink.mp3",
   },
   canoe: {
     estonian: "kanuu",
     english: "canoe",
+    audio: "/audio/kanuu.mp3",
   },
   flowers: {
     estonian: "lilled",
     english: "flowers",
+    audio: "/audio/lilled.mp3",
   },
   mushrooms: {
     estonian: "seened",
     english: "mushrooms",
+    audio: "/audio/seened.mp3",
   },
   stone: {
     estonian: "kivi",
     english: "stone",
+    audio: "/audio/kivi.mp3",
   },
   tree: {
     estonian: "puu",
     english: "tree",
+    audio: "/audio/puu.mp3",
   },
   fence: {
     estonian: "aed",
     english: "fence",
+    audio: "/audio/aed.mp3",
   },
 };
 
@@ -260,11 +270,20 @@ function WordOverlay({ word, onClose }: { word: string; onClose: () => void }) {
   const entry = VOCABULARY[word];
   if (!entry) return null;
 
+  function playAudio() {
+    if (!entry.audio) return;
+    const audio = new Audio(entry.audio);
+    audio.play();
+  }
+
   return (
     <div className="overlay-backdrop" onClick={onClose}>
       <div className="overlay-card" onClick={(e) => e.stopPropagation()}>
         <p className="overlay-estonian">{entry.estonian}</p>
         <p className="overlay-english">{entry.english}</p>
+        <button className="overlay-audio" onClick={playAudio}>
+          🔊
+        </button>
         <button className="overlay-close" onClick={onClose}>
           close
         </button>
