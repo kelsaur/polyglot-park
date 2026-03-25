@@ -1,6 +1,6 @@
 import * as THREE from "three";
 import { Canvas, useFrame } from "@react-three/fiber";
-import { Environment, OrbitControls, useGLTF } from "@react-three/drei";
+import { Environment, OrbitControls, useGLTF, Html } from "@react-three/drei";
 import type { JSX } from "react";
 import type { OrbitControls as OrbitControlsImpl } from "three-stdlib";
 import { useRef, useEffect, useState } from "react";
@@ -183,10 +183,12 @@ function HoverMesh({
   hitPadding?: number;
   word: string;
   onSelect: (word: string) => void;
+  isVisited?: boolean;
 }) {
   const ref = useRef<THREE.Group>(null);
   const hitRef = useRef<THREE.Mesh>(null);
   const [hovered, setHovered] = useState(false);
+  const [visited, setVisited] = useState(false);
 
   //set emissive to 0 on mount so it doesn't flash
   useEffect(() => {
@@ -243,6 +245,12 @@ function HoverMesh({
 
   return (
     <group>
+      {visited && (
+        <Html position={[-1, 1, 0]} transform sprite>
+          <div className="checkmark">✓</div>
+        </Html>
+      )}
+
       {/* invisible hitbox a little bigger than model */}
       <mesh
         ref={hitRef}
@@ -253,6 +261,7 @@ function HoverMesh({
         onClick={(e) => {
           e.stopPropagation(); //stops click reaching ClickToFocus plane below
           onSelect(word);
+          setVisited(true);
         }}
       >
         <boxGeometry args={[1, 1, 1]} />
