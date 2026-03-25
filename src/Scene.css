@@ -61,3 +61,14 @@
   width: 100%;
   display: block;
 }
+
+.checkmark {
+  background: #4caf50;
+  color: white;
+  border-radius: 50%;
+  width: 2rem;
+  height: 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
