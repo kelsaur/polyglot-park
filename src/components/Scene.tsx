@@ -178,17 +178,22 @@ function HoverMesh({
   hitPadding = 0.3,
   word,
   onSelect,
+  isVisited = false,
+  isAnySelected = false,
 }: {
   children: React.ReactNode;
   hitPadding?: number;
   word: string;
   onSelect: (word: string) => void;
   isVisited?: boolean;
+  isAnySelected?: boolean;
 }) {
   const ref = useRef<THREE.Group>(null);
   const hitRef = useRef<THREE.Mesh>(null);
   const [hovered, setHovered] = useState(false);
-  const [visited, setVisited] = useState(false);
+  const [meshTop, setMeshTop] = useState<THREE.Vector3>(
+    new THREE.Vector3(0, 4, 0),
+  );
 
   //set emissive to 0 on mount so it doesn't flash
   useEffect(() => {
@@ -201,18 +206,23 @@ function HoverMesh({
     });
   }, []);
 
-  //resize hitbox to match model bounds + padding
+  //resize hitbox + calculate mesh top for checkmark
   useEffect(() => {
     if (!ref.current || !hitRef.current) return;
     const box = new THREE.Box3().setFromObject(ref.current);
     const size = box.getSize(new THREE.Vector3());
     const center = box.getCenter(new THREE.Vector3());
+
+    //hitbox
     hitRef.current.scale.set(
       size.x + hitPadding,
       size.y + hitPadding,
       size.z + hitPadding,
     );
     hitRef.current.position.copy(center);
+
+    //checkmark position: top of mesh center + 1 unit above
+    setMeshTop(new THREE.Vector3(center.x, box.max.y + 1, center.z));
   }, [hitPadding]);
 
   //cursor pointer
@@ -226,13 +236,11 @@ function HoverMesh({
   //smooth scale + emissive
   useFrame(() => {
     if (!ref.current) return;
-
     const targetScale = hovered ? 1.1 : 1.0;
     ref.current.scale.lerp(
       new THREE.Vector3(targetScale, targetScale, targetScale),
       0.05,
     );
-
     ref.current.traverse((child) => {
       if (child instanceof THREE.Mesh) {
         const targetIntensity = hovered ? 0.1 : 0;
@@ -245,13 +253,19 @@ function HoverMesh({
 
   return (
     <group>
-      {visited && (
-        <Html position={[-1, 1, 0]} transform sprite>
+      {/* checkmark above mesh, only when visited */}
+      {isVisited && !isAnySelected && (
+        <Html
+          position={[meshTop.x, meshTop.y, meshTop.z]}
+          center
+          transform
+          sprite
+        >
           <div className="checkmark">✓</div>
         </Html>
       )}
 
-      {/* invisible hitbox a little bigger than model */}
+      {/* invisible hitbox */}
       <mesh
         ref={hitRef}
         visible={false}
@@ -259,9 +273,8 @@ function HoverMesh({
         onPointerOut={() => setHovered(false)}
         onPointerUp={(e) => e.stopPropagation()}
         onClick={(e) => {
-          e.stopPropagation(); //stops click reaching ClickToFocus plane below
+          e.stopPropagation();
           onSelect(word);
-          setVisited(true);
         }}
       >
         <boxGeometry args={[1, 1, 1]} />
@@ -304,6 +317,13 @@ function WordOverlay({ word, onClose }: { word: string; onClose: () => void }) {
 export default function Scene(): JSX.Element {
   const controlsRef = useRef<OrbitControlsImpl>(null);
   const [selected, setSelected] = useState<string | null>(null);
+  const [visited, setVisited] = useState<Set<string>>(new Set());
+
+  //mark as visited when overlay is closed
+  function handleClose() {
+    if (selected) setVisited((prev) => new Set(prev).add(selected));
+    setSelected(null);
+  }
 
   return (
     <div className="scene-wrapper">
@@ -378,26 +398,61 @@ export default function Scene(): JSX.Element {
 
         {/* models */}
         <ParkScene />
-        <HoverMesh word="bench" onSelect={setSelected}>
+        <HoverMesh
+          word="bench"
+          onSelect={setSelected}
+          isVisited={visited.has("bench")}
+          isAnySelected={!!selected}
+        >
           <Bench />
         </HoverMesh>
-        <HoverMesh word="canoe" onSelect={setSelected}>
+        <HoverMesh
+          word="canoe"
+          onSelect={setSelected}
+          isVisited={visited.has("canoe")}
+          isAnySelected={!!selected}
+        >
           <Canoe />
         </HoverMesh>
-        <HoverMesh word="fence" onSelect={setSelected}>
+        <HoverMesh
+          word="fence"
+          onSelect={setSelected}
+          isVisited={visited.has("fence")}
+          isAnySelected={!!selected}
+        >
           <Fence />
         </HoverMesh>
-        <HoverMesh word="flowers" onSelect={setSelected}>
+        <HoverMesh
+          word="flowers"
+          onSelect={setSelected}
+          isVisited={visited.has("flowers")}
+          isAnySelected={!!selected}
+        >
           <Flowers />
         </HoverMesh>
         <Lake />
-        <HoverMesh word="mushrooms" onSelect={setSelected}>
+        <HoverMesh
+          word="mushrooms"
+          onSelect={setSelected}
+          isVisited={visited.has("mushrooms")}
+          isAnySelected={!!selected}
+        >
           <Mushrooms />
         </HoverMesh>
-        <HoverMesh word="stone" onSelect={setSelected}>
+        <HoverMesh
+          word="stone"
+          onSelect={setSelected}
+          isVisited={visited.has("stone")}
+          isAnySelected={!!selected}
+        >
           <Stone />
         </HoverMesh>
-        <HoverMesh word="tree" onSelect={setSelected}>
+        <HoverMesh
+          word="tree"
+          onSelect={setSelected}
+          isVisited={visited.has("tree")}
+          isAnySelected={!!selected}
+        >
           <Tree />
         </HoverMesh>
         <Clouds path="/models/cloud1.glb" position={[3, 5, -3]} offset={0} />
@@ -422,10 +477,7 @@ export default function Scene(): JSX.Element {
         />
       </Canvas>
 
-      {/* word overlaym*/}
-      {selected && (
-        <WordOverlay word={selected} onClose={() => setSelected(null)} />
-      )}
+      {selected && <WordOverlay word={selected} onClose={handleClose} />}
     </div>
   );
 }
