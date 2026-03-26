@@ -1,0 +1,66 @@
+.completion-backdrop {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1;
+}
+
+.completion-card {
+  background: #f7f5f0;
+  border-radius: 1.5rem;
+  padding: 2.5rem 3rem;
+  text-align: center;
+  max-width: 340px;
+  width: 100%;
+  box-shadow: 0 1rem 3rem rgba(0, 0, 0, 0.15);
+  animation: popIn 0.4s ease forwards;
+}
+
+@keyframes popIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.completion-star {
+  font-size: 2.5rem;
+  margin-bottom: 1rem;
+}
+
+.completion-title {
+  font-size: 1.75rem;
+  font-weight: 400;
+  color: #1a1a1a;
+  margin: 0 0 0.5rem;
+}
+
+.completion-description {
+  font-size: 0.9rem;
+  color: #888;
+  margin: 0 0 2rem;
+  line-height: 1.6;
+}
+
+.completion-startover-btn {
+  background: #2ecc8a;
+  color: white;
+  border: none;
+  border-radius: 2rem;
+  padding: 0.875rem 2rem;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  width: 100%;
+  margin-bottom: 0.75rem;
+  font-family: inherit;
+  transition: background 0.2s;
+}
+
+.completion-startover-btn:hover {
+  background: #26b87b;
+}

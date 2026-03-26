@@ -20,16 +20,34 @@ import {
 import { Clouds } from "./Clouds";
 import { ParkScene } from "./ParkScene";
 import { Suspense } from "react";
+import ProgressBar from "../ui/ProgressBar";
+import { VOCABULARY } from "../../data/vocabulary";
+import CompletionPopup from "../ui/CompletionPopup";
+
+const TOTAL_WORDS = Object.keys(VOCABULARY).length;
 
 export default function Scene(): JSX.Element {
   const controlsRef = useRef<OrbitControlsImpl>(null);
   const [selected, setSelected] = useState<string | null>(null);
   const [visited, setVisited] = useState<Set<string>>(new Set());
+  const [showCompletion, setShowCompletion] = useState(false);
 
   //mark as visited when overlay is closed
   function handleClose() {
-    if (selected) setVisited((prev) => new Set(prev).add(selected));
+    if (selected) {
+      const newVisited = new Set(visited).add(selected);
+      setVisited(newVisited);
+      if (newVisited.size === TOTAL_WORDS) {
+        setShowCompletion(true);
+      }
+    }
     setSelected(null);
+  }
+
+  // resets all visited words and hides completion popup
+  function handleStartOver() {
+    setVisited(new Set());
+    setShowCompletion(false);
   }
 
   return (
@@ -110,7 +128,7 @@ export default function Scene(): JSX.Element {
             word="bench"
             onSelect={setSelected}
             isVisited={visited.has("bench")}
-            isAnySelected={!!selected}
+            isAnySelected={!!selected || showCompletion}
           >
             <Bench />
           </HoverMesh>
@@ -118,7 +136,7 @@ export default function Scene(): JSX.Element {
             word="canoe"
             onSelect={setSelected}
             isVisited={visited.has("canoe")}
-            isAnySelected={!!selected}
+            isAnySelected={!!selected || showCompletion}
           >
             <Canoe />
           </HoverMesh>
@@ -126,7 +144,7 @@ export default function Scene(): JSX.Element {
             word="fence"
             onSelect={setSelected}
             isVisited={visited.has("fence")}
-            isAnySelected={!!selected}
+            isAnySelected={!!selected || showCompletion}
           >
             <Fence />
           </HoverMesh>
@@ -134,7 +152,7 @@ export default function Scene(): JSX.Element {
             word="flowers"
             onSelect={setSelected}
             isVisited={visited.has("flowers")}
-            isAnySelected={!!selected}
+            isAnySelected={!!selected || showCompletion}
           >
             <Flowers />
           </HoverMesh>
@@ -143,7 +161,7 @@ export default function Scene(): JSX.Element {
             word="mushrooms"
             onSelect={setSelected}
             isVisited={visited.has("mushrooms")}
-            isAnySelected={!!selected}
+            isAnySelected={!!selected || showCompletion}
           >
             <Mushrooms />
           </HoverMesh>
@@ -151,7 +169,7 @@ export default function Scene(): JSX.Element {
             word="stone"
             onSelect={setSelected}
             isVisited={visited.has("stone")}
-            isAnySelected={!!selected}
+            isAnySelected={!!selected || showCompletion}
           >
             <Stone />
           </HoverMesh>
@@ -159,7 +177,7 @@ export default function Scene(): JSX.Element {
             word="tree"
             onSelect={setSelected}
             isVisited={visited.has("tree")}
-            isAnySelected={!!selected}
+            isAnySelected={!!selected || showCompletion}
           >
             <Tree />
           </HoverMesh>
@@ -190,7 +208,11 @@ export default function Scene(): JSX.Element {
         </Suspense>
       </Canvas>
 
+      <ProgressBar visited={visited} total={TOTAL_WORDS} />
+
       {selected && <WordOverlay word={selected} onClose={handleClose} />}
+
+      {showCompletion && <CompletionPopup onStartOver={handleStartOver} />}
     </div>
   );
 }

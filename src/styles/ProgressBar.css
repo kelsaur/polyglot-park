@@ -1,0 +1,32 @@
+.progress-wrapper {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.4rem;
+  z-index: 1;
+}
+
+.progress-track {
+  background: rgba(255, 255, 255, 0.3);
+  border-radius: 2rem;
+  width: 120px;
+  height: 8px;
+  overflow: hidden;
+}
+
+.progress-fill {
+  background: #2ecc8a;
+  height: 100%;
+  border-radius: 2rem;
+  transition: width 0.4s ease;
+}
+
+.progress-complete {
+  font-size: 0.7rem;
+  color: #2ecc8a;
+  font-weight: 600;
+  margin: 0;
+}
