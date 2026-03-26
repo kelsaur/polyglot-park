@@ -1,6 +1,27 @@
+@import url("https://fonts.googleapis.com/css2?family=Righteous&family=Sora:wght@400;500;600&display=swap");
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
 html,
 body,
 #root {
   height: 100%;
-  margin: 0;
+}
+
+body {
+  font-family: "Sora", sans-serif;
+  font-size: 16px;
+}
+
+h1,
+h2,
+h3 {
+  font-family: "Righteous", sans-serif;
+  font-weight: 400;
 }

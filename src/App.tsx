@@ -1,8 +1,11 @@
-import Scene from "./components/Scene.tsx";
 import "./index.css";
+import { useState } from "react";
+import StartScreen from "./components/ui/StartScreen";
+import Scene from "./components/scene/Scene";
 
-function App() {
+export default function App() {
+  const [started, setStarted] = useState(false);
+
+  if (!started) return <StartScreen onStart={() => setStarted(true)} />;
   return <Scene />;
 }
-
-export default App;
