@@ -5,7 +5,7 @@ import { Html } from "@react-three/drei";
 
 export function HoverMesh({
   children,
-  hitPadding = 0.3,
+  hitPadding = 0.01,
   word,
   onSelect,
   isVisited = false,

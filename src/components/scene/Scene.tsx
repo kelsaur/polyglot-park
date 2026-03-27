@@ -23,10 +23,10 @@ import { Clouds } from "./Clouds";
 import { ParkScene } from "./ParkScene";
 import { Suspense } from "react";
 import ProgressBar from "../ui/ProgressBar";
-import { VOCABULARY } from "../../data/vocabulary";
+import { DAY_VOCABULARY } from "../../data/vocabulary";
 import CompletionPopup from "../ui/CompletionPopup";
 
-const TOTAL_WORDS = Object.keys(VOCABULARY).length;
+const TOTAL_WORDS = Object.keys(DAY_VOCABULARY).length;
 const INITIAL_ZOOM = 60;
 const INITIAL_TARGET = new THREE.Vector3(0.05, 2, 0);
 const INITIAL_POSITION = new THREE.Vector3(10, 10, 10);
@@ -243,7 +243,13 @@ export default function Scene(): JSX.Element {
 
       <ProgressBar visited={visited} total={TOTAL_WORDS} />
 
-      {selected && <WordOverlay word={selected} onClose={handleClose} />}
+      {selected && (
+        <WordOverlay
+          word={selected}
+          onClose={handleClose}
+          vocabulary={DAY_VOCABULARY}
+        />
+      )}
 
       {showCompletion && <CompletionPopup onStartOver={handleStartOver} />}
     </div>

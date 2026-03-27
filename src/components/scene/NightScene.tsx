@@ -28,10 +28,11 @@ import { Clouds } from "./Clouds";
 import { ParkScene } from "./ParkScene";
 import { Suspense } from "react";
 import ProgressBar from "../ui/ProgressBar";
-import { VOCABULARY } from "../../data/vocabulary";
+import { NIGHT_VOCABULARY } from "../../data/vocabulary";
 import CompletionPopup from "../ui/CompletionPopup";
+import { Fireflies } from "./Fireflies";
 
-const TOTAL_WORDS = Object.keys(VOCABULARY).length;
+const TOTAL_WORDS = Object.keys(NIGHT_VOCABULARY).length;
 const INITIAL_ZOOM = 60;
 const INITIAL_TARGET = new THREE.Vector3(0.05, 2, 0);
 const INITIAL_POSITION = new THREE.Vector3(10, 10, 10);
@@ -110,37 +111,71 @@ export default function NightScene(): JSX.Element {
           {/*<directionalLight intensity={2} position={[10, 20, 10]} castShadow />*/}
 
           <Environment files="/hdri/hdr-night.hdr" />
+
+          {/* Light position helper */}
+          {/* <mesh position={[3, 0.5, -3]}>
+            <sphereGeometry args={[0.1]} />
+            <meshBasicMaterial color="yellow" />
+          </mesh>*/}
+
           {/* Point light 1 - trees back*/}
           <pointLight
             position={[-0.7, 0.5, -2]}
             intensity={1}
             color="#ff5500"
-            decay={3}
-          />
-
-          {/*<mesh position={[-0.7, 0.5, -2]}>
-        <sphereGeometry args={[0.1]} />
-        <meshBasicMaterial color="yellow" />
-      </mesh>*/}
-
-          {/* Point light 2 - left grass*/}
-          <pointLight
-            position={[-3, 0.3, 2.7]}
-            intensity={0.5}
-            color="#ffcc88"
             decay={2}
           />
 
-          {/* Point light 3 - lake*/}
+          {/* Point light 2 - owl*/}
+          <pointLight
+            position={[-0.2, 1.3, -1.4]}
+            intensity={0.5}
+            color="#ff5500"
+            decay={2}
+          />
+
+          {/* Point light 3 - mountains*/}
+          <pointLight
+            position={[-2, 0.5, 0]}
+            intensity={1}
+            color="#ffbb00"
+            decay={1}
+          />
+
+          {/* Point light 4 - trees right*/}
+          <pointLight
+            position={[2, 1, -3]}
+            intensity={1}
+            color="#ff9500"
+            decay={1}
+          />
+
+          {/* Point light 5 - campfire*/}
+          <pointLight
+            position={[1.78, 0.15, 2.33]}
+            intensity={1}
+            color="#ff2200"
+            decay={2}
+          />
+
+          {/* Point light 6 - fence grass*/}
+          <pointLight
+            position={[-3, 0.5, 2.7]}
+            intensity={1}
+            color="#ffbf00"
+            decay={2}
+          />
+
+          {/* Point light 7 - lake*/}
           <pointLight
             position={[1.5, 0.2, -0.2]}
             intensity={0.8}
-            color="#aaddff"
-            decay={0.5}
-            distance={5}
+            color="#00ffbf"
+            decay={1}
+            distance={4}
           />
 
-          {/* Point light 4 - flowers front*/}
+          {/* Point light 8 - flowers front*/}
           <pointLight
             position={[3, 0.4, 3]}
             intensity={0.5}
@@ -150,63 +185,68 @@ export default function NightScene(): JSX.Element {
 
           {/* models */}
           <ParkScene />
-          <HoverMesh
-            word="bench"
-            onSelect={setSelected}
-            isVisited={visited.has("bench")}
-            isAnySelected={!!selected || showCompletion}
-          >
-            <Bench />
-          </HoverMesh>
-          <HoverMesh
-            word="canoe"
-            onSelect={setSelected}
-            isVisited={visited.has("canoe")}
-            isAnySelected={!!selected || showCompletion}
-          >
-            <Canoe />
-          </HoverMesh>
-          <HoverMesh
-            word="fence"
-            onSelect={setSelected}
-            isVisited={visited.has("fence")}
-            isAnySelected={!!selected || showCompletion}
-          >
-            <Fence />
-          </HoverMesh>
-          <HoverMesh
-            word="flowers"
-            onSelect={setSelected}
-            isVisited={visited.has("flowers")}
-            isAnySelected={!!selected || showCompletion}
-          >
-            <Flowers />
-          </HoverMesh>
+          <Bench />
+          <Canoe />
+          <Fence />
+          <Flowers />
           <Lake />
+          <Mushrooms />
+          <Stone />
+          <Tree />
+
+          <Fireflies count={10} />
+
+          {/* interactive models */}
           <HoverMesh
-            word="mushrooms"
+            word="frog"
             onSelect={setSelected}
-            isVisited={visited.has("mushrooms")}
+            isVisited={visited.has("frog")}
             isAnySelected={!!selected || showCompletion}
           >
-            <Mushrooms />
+            <Frog />
           </HoverMesh>
           <HoverMesh
-            word="stone"
+            word="deer"
             onSelect={setSelected}
-            isVisited={visited.has("stone")}
+            isVisited={visited.has("deer")}
             isAnySelected={!!selected || showCompletion}
           >
-            <Stone />
+            <Deer />
           </HoverMesh>
           <HoverMesh
-            word="tree"
+            word="owl"
             onSelect={setSelected}
-            isVisited={visited.has("tree")}
+            isVisited={visited.has("owl")}
             isAnySelected={!!selected || showCompletion}
           >
-            <Tree />
+            <Owl />
           </HoverMesh>
+          <HoverMesh
+            word="campfire"
+            onSelect={setSelected}
+            isVisited={visited.has("campfire")}
+            isAnySelected={!!selected || showCompletion}
+          >
+            <Campfire />
+          </HoverMesh>
+          <HoverMesh
+            word="tent"
+            onSelect={setSelected}
+            isVisited={visited.has("tent")}
+            isAnySelected={!!selected || showCompletion}
+          >
+            <Tent />
+          </HoverMesh>
+          <HoverMesh
+            word="moon"
+            onSelect={setSelected}
+            isVisited={visited.has("moon")}
+            isAnySelected={!!selected || showCompletion}
+          >
+            <Moon position={[-3, 6.5, 1]} rotation={[0, -0.5, 0.5]} />
+          </HoverMesh>
+
+          {/* Clouds */}
           <Clouds path="/models/cloud1.glb" position={[3, 5, -3]} offset={0} />
           <Clouds
             path="/models/cloud2.glb"
@@ -232,12 +272,6 @@ export default function NightScene(): JSX.Element {
             offset={0.5}
           />
         </Suspense>
-        <Frog />
-        <Deer />
-        <Owl />
-        <Campfire />
-        <Tent />
-        <Moon position={[-3, 6.5, 1]} rotation={[0, -0.5, 0.5]} />
       </Canvas>
 
       <button className="reset-btn" onClick={handleResetView}>
@@ -246,7 +280,13 @@ export default function NightScene(): JSX.Element {
 
       <ProgressBar visited={visited} total={TOTAL_WORDS} />
 
-      {selected && <WordOverlay word={selected} onClose={handleClose} />}
+      {selected && (
+        <WordOverlay
+          word={selected}
+          onClose={handleClose}
+          vocabulary={NIGHT_VOCABULARY}
+        />
+      )}
 
       {showCompletion && <CompletionPopup onStartOver={handleStartOver} />}
     </div>

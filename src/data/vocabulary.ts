@@ -1,4 +1,4 @@
-export const VOCABULARY: Record<
+export const DAY_VOCABULARY: Record<
   string,
   { estonian: string; english: string; audio?: string }
 > = {
@@ -41,5 +41,41 @@ export const VOCABULARY: Record<
     estonian: "aed",
     english: "fence",
     audio: "/audio/aed.mp3",
+  },
+};
+
+export const NIGHT_VOCABULARY: Record<
+  string,
+  { estonian: string; english: string; audio?: string }
+> = {
+  frog: {
+    estonian: "konn",
+    english: "frog",
+    audio: "/audio/konn.mp3",
+  },
+  deer: {
+    estonian: "hirv",
+    english: "deer",
+    audio: "/audio/hirv.mp3",
+  },
+  owl: {
+    estonian: "öökull",
+    english: "owl",
+    audio: "/audio/ookull.mp3",
+  },
+  campfire: {
+    estonian: "lõke",
+    english: "campfire",
+    audio: "/audio/loke.mp3",
+  },
+  tent: {
+    estonian: "telk",
+    english: "tent",
+    audio: "/audio/telk.mp3",
+  },
+  moon: {
+    estonian: "kuu",
+    english: "moon",
+    audio: "/audio/kuu.mp3",
   },
 };
