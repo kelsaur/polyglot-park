@@ -1,3 +1,4 @@
+import * as THREE from "three";
 import { useRef } from "react";
 import { useFrame } from "@react-three/fiber";
 import type { OrbitControls as OrbitControlsImpl } from "three-stdlib";
@@ -8,43 +9,47 @@ export function ClickToFocus({
   controlsRef: React.RefObject<OrbitControlsImpl | null>;
 }) {
   const zoomRef = useRef<number | null>(null);
-  const downPos = useRef<{ x: number; y: number } | null>(null);
-  const dragged = useRef(false);
+  const targetRef = useRef<THREE.Vector3 | null>(null);
 
-  //smoothly move camera target to click point
   useFrame(() => {
-    if (!zoomRef.current || !controlsRef.current) return;
+    if (!controlsRef.current) return;
 
-    const cam = controlsRef.current.object;
-    cam.zoom += (zoomRef.current - cam.zoom) * 0.05;
-    cam.updateProjectionMatrix();
+    //smooth zoom
+    if (zoomRef.current) {
+      const cam = controlsRef.current.object;
+      cam.zoom += (zoomRef.current - cam.zoom) * 0.1;
+      cam.updateProjectionMatrix();
+      if (Math.abs(cam.zoom - zoomRef.current) < 0.1) {
+        cam.zoom = zoomRef.current;
+        zoomRef.current = null;
+      }
+    }
 
-    if (Math.abs(cam.zoom - zoomRef.current) < 0.1) {
-      cam.zoom = zoomRef.current;
-      zoomRef.current = null;
+    //smooth pan to clicked point
+    if (targetRef.current) {
+      controlsRef.current.target.lerp(targetRef.current, 0.1);
+      controlsRef.current.update();
+      if (controlsRef.current.target.distanceTo(targetRef.current) < 0.01) {
+        controlsRef.current.target.copy(targetRef.current);
+        targetRef.current = null;
+      }
     }
   });
 
   return (
-    //invisible plane on the ground to catch clicks
     <mesh
       rotation-x={-Math.PI / 2}
       position={[0, 0, 0]}
-      onPointerDown={(e) => {
-        downPos.current = { x: e.clientX, y: e.clientY };
-        dragged.current = false;
-      }}
-      onPointerMove={(e) => {
-        if (!downPos.current) return;
-        const dx = e.clientX - downPos.current.x;
-        const dy = e.clientY - downPos.current.y;
-        if (dx * dx + dy * dy > 25) dragged.current = true;
-      }}
-      onPointerUp={() => {
-        if (dragged.current) return; //was a drag/rotate, skip zoom
+      onDoubleClick={(e) => {
+        e.stopPropagation();
         if (!controlsRef.current) return;
+
+        //zoom in
         const cam = controlsRef.current.object;
         zoomRef.current = Math.min(cam.zoom * 1.5, 200);
+
+        //pan to where user double clicked
+        targetRef.current = new THREE.Vector3(e.point.x, 0, e.point.z);
       }}
     >
       <planeGeometry args={[100, 100]} />
