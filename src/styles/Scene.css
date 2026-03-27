@@ -14,10 +14,16 @@
   }
 }
 
-.scene-canvas {
+.scene-canvas-day {
   height: 100vh;
   width: 100vw;
   background: #a8c6d8;
+}
+
+.scene-canvas-night {
+  height: 100vh;
+  width: 100vw;
+  background: #001f32;
 }
 
 .overlay-backdrop {

@@ -17,6 +17,7 @@ import {
   Mushrooms,
   Stone,
   Tree,
+  Path,
 } from "./Models";
 import { Clouds } from "./Clouds";
 import { ParkScene } from "./ParkScene";
@@ -73,7 +74,7 @@ export default function Scene(): JSX.Element {
   return (
     <div className="scene-wrapper">
       <Canvas
-        className="scene-canvas"
+        className="scene-canvas-day"
         onCreated={({ scene }) => {
           scene.environmentIntensity = 0.5;
           scene.environmentRotation.y = Math.PI / 5;
@@ -103,7 +104,7 @@ export default function Scene(): JSX.Element {
           <ambientLight intensity={0.5} />
           {/*<directionalLight intensity={2} position={[10, 20, 10]} castShadow />*/}
 
-          <Environment files="/hdri/env3.hdr" />
+          <Environment files="/hdri/hdr-day.hdr" />
           {/* Point light 1 - trees back*/}
           <pointLight
             position={[-0.7, 0.5, -2]}
@@ -200,6 +201,14 @@ export default function Scene(): JSX.Element {
             isAnySelected={!!selected || showCompletion}
           >
             <Tree />
+          </HoverMesh>
+          <HoverMesh
+            word="path"
+            onSelect={setSelected}
+            isVisited={visited.has("path")}
+            isAnySelected={!!selected || showCompletion}
+          >
+            <Path />
           </HoverMesh>
           <Clouds path="/models/cloud1.glb" position={[3, 5, -3]} offset={0} />
           <Clouds

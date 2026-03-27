@@ -32,6 +32,11 @@ export const VOCABULARY: Record<
     english: "tree",
     audio: "/audio/puu.mp3",
   },
+  path: {
+    estonian: "teerada",
+    english: "path",
+    audio: "/audio/teerada.mp3",
+  },
   fence: {
     estonian: "aed",
     english: "fence",
