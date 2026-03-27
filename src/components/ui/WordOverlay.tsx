@@ -1,13 +1,14 @@
-import { VOCABULARY } from "../../data/vocabulary";
-
-export function WordOverlay({
-  word,
-  onClose,
-}: {
+interface WordOverlayProps {
   word: string;
   onClose: () => void;
-}) {
-  const entry = VOCABULARY[word];
+  vocabulary: Record<
+    string,
+    { estonian: string; english: string; audio?: string }
+  >;
+}
+
+export function WordOverlay({ word, onClose, vocabulary }: WordOverlayProps) {
+  const entry = vocabulary[word];
   if (!entry) return null;
 
   function playAudio() {
