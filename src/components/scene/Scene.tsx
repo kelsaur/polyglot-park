@@ -1,3 +1,4 @@
+import * as THREE from "three";
 import { Canvas } from "@react-three/fiber";
 import { Environment, OrbitControls } from "@react-three/drei";
 import type { JSX } from "react";
@@ -25,12 +26,31 @@ import { VOCABULARY } from "../../data/vocabulary";
 import CompletionPopup from "../ui/CompletionPopup";
 
 const TOTAL_WORDS = Object.keys(VOCABULARY).length;
+const INITIAL_ZOOM = 60;
+const INITIAL_TARGET = new THREE.Vector3(0.05, 2, 0);
+const INITIAL_POSITION = new THREE.Vector3(10, 10, 10);
 
 export default function Scene(): JSX.Element {
   const controlsRef = useRef<OrbitControlsImpl>(null);
+  const cancelFocusRef = useRef<(() => void) | null>(null);
   const [selected, setSelected] = useState<string | null>(null);
   const [visited, setVisited] = useState<Set<string>>(new Set());
   const [showCompletion, setShowCompletion] = useState(false);
+
+  function handleResetView() {
+    //cancel any ongoing zoom/pan animation first
+    cancelFocusRef.current?.();
+
+    if (!controlsRef.current) return;
+    const controls = controlsRef.current;
+    const cam = controls.object;
+
+    controls.target.copy(INITIAL_TARGET);
+    cam.position.copy(INITIAL_POSITION);
+    cam.zoom = INITIAL_ZOOM;
+    cam.updateProjectionMatrix();
+    controls.update();
+  }
 
   //mark as visited when overlay is closed
   function handleClose() {
@@ -44,7 +64,7 @@ export default function Scene(): JSX.Element {
     setSelected(null);
   }
 
-  // resets all visited words and hides completion popup
+  //resets all visited words and hides completion popup
   function handleStartOver() {
     setVisited(new Set());
     setShowCompletion(false);
@@ -60,8 +80,8 @@ export default function Scene(): JSX.Element {
         }}
         orthographic
         camera={{
-          position: [10, 10, 10],
-          zoom: 60,
+          position: INITIAL_POSITION.toArray(),
+          zoom: INITIAL_ZOOM,
           near: 0.1,
           far: 1000,
         }}
@@ -69,7 +89,7 @@ export default function Scene(): JSX.Element {
         <Suspense fallback={null}>
           <OrbitControls
             ref={controlsRef}
-            target={[0.05, 2, 0]}
+            target={INITIAL_TARGET.toArray()}
             enableRotate={true}
             enableZoom={true}
             enablePan={true}
@@ -77,7 +97,7 @@ export default function Scene(): JSX.Element {
             maxPolarAngle={Math.PI / 2.5}
           />
 
-          <ClickToFocus controlsRef={controlsRef} />
+          <ClickToFocus controlsRef={controlsRef} cancelRef={cancelFocusRef} />
 
           {/* lighting */}
           <ambientLight intensity={0.5} />
@@ -207,6 +227,10 @@ export default function Scene(): JSX.Element {
           />
         </Suspense>
       </Canvas>
+
+      <button className="reset-btn" onClick={handleResetView}>
+        ⟳ Reset view
+      </button>
 
       <ProgressBar visited={visited} total={TOTAL_WORDS} />
 
