@@ -3,7 +3,7 @@ import { Canvas } from "@react-three/fiber";
 import { Environment, OrbitControls } from "@react-three/drei";
 import type { JSX } from "react";
 import type { OrbitControls as OrbitControlsImpl } from "three-stdlib";
-import { useRef, useState } from "react";
+import { useRef, useState, useEffect } from "react";
 import "../../styles/Scene.css";
 import { WordOverlay } from "../ui/WordOverlay";
 import { HoverMesh } from "../helpers/HoverMesh";
@@ -31,7 +31,7 @@ const INITIAL_ZOOM = 60;
 const INITIAL_TARGET = new THREE.Vector3(0.05, 2, 0);
 const INITIAL_POSITION = new THREE.Vector3(10, 10, 10);
 
-export default function Scene({
+export default function DayScene({
   onNightMode,
   onStartOver,
 }: {
@@ -43,6 +43,18 @@ export default function Scene({
   const [selected, setSelected] = useState<string | null>(null);
   const [visited, setVisited] = useState<Set<string>>(new Set());
   const [showCompletion, setShowCompletion] = useState(false);
+
+  useEffect(() => {
+    const audio = new Audio("/audio/ambience-day.mp3");
+    audio.loop = true;
+    audio.volume = 0.3;
+    audio.play();
+
+    return () => {
+      audio.pause();
+      audio.src = "";
+    };
+  }, []);
 
   function handleResetView() {
     //cancel any ongoing zoom/pan animation first
@@ -210,7 +222,12 @@ export default function Scene({
           >
             <Path />
           </HoverMesh>
-          <Clouds path="/models/cloud1.glb" position={[3, 5, -3]} offset={0} />
+          <Clouds
+            path="/models/cloud1.glb"
+            position={[3, 5, -3]}
+            offset={0}
+            hoverSound="/audio/wind.mp3"
+          />
           <Clouds
             path="/models/cloud2.glb"
             position={[-1, 7, 5]}
@@ -222,6 +239,7 @@ export default function Scene({
             position={[-3, 4, -3]}
             offset={3}
             rotation={[0, Math.PI / -6, 0]}
+            hoverSound="/audio/wind.mp3"
           />
           <Clouds path="/models/cloud3.glb" position={[0, 9, 0]} offset={4} />
           <Clouds
@@ -233,6 +251,7 @@ export default function Scene({
             path="/models/cloud2.glb"
             position={[3, 6.6, -1]}
             offset={0.5}
+            hoverSound="/audio/wind.mp3"
           />
         </Suspense>
       </Canvas>
