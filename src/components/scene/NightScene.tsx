@@ -37,7 +37,11 @@ const INITIAL_ZOOM = 60;
 const INITIAL_TARGET = new THREE.Vector3(0.05, 2, 0);
 const INITIAL_POSITION = new THREE.Vector3(10, 10, 10);
 
-export default function NightScene(): JSX.Element {
+export default function NightScene({
+  onStartOver,
+}: {
+  onStartOver: () => void;
+}): JSX.Element {
   const controlsRef = useRef<OrbitControlsImpl>(null);
   const cancelFocusRef = useRef<(() => void) | null>(null);
   const [selected, setSelected] = useState<string | null>(null);
@@ -69,12 +73,6 @@ export default function NightScene(): JSX.Element {
       }
     }
     setSelected(null);
-  }
-
-  //resets all visited words and hides completion popup
-  function handleStartOver() {
-    setVisited(new Set());
-    setShowCompletion(false);
   }
 
   return (
@@ -288,7 +286,7 @@ export default function NightScene(): JSX.Element {
         />
       )}
 
-      {showCompletion && <CompletionPopup onStartOver={handleStartOver} />}
+      {showCompletion && <CompletionPopup onStartOver={onStartOver} />}
     </div>
   );
 }
