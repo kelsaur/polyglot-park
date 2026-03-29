@@ -3,7 +3,7 @@ import { Canvas } from "@react-three/fiber";
 import { Environment, OrbitControls } from "@react-three/drei";
 import type { JSX } from "react";
 import type { OrbitControls as OrbitControlsImpl } from "three-stdlib";
-import { useRef, useState } from "react";
+import { useRef, useState, useEffect } from "react";
 import "../../styles/Scene.css";
 import { WordOverlay } from "../ui/WordOverlay";
 import { HoverMesh } from "../helpers/HoverMesh";
@@ -47,6 +47,18 @@ export default function NightScene({
   const [selected, setSelected] = useState<string | null>(null);
   const [visited, setVisited] = useState<Set<string>>(new Set());
   const [showCompletion, setShowCompletion] = useState(false);
+
+  useEffect(() => {
+    const audio = new Audio("/audio/ambience-night.mp3");
+    audio.loop = true;
+    audio.volume = 0.3;
+    audio.play();
+
+    return () => {
+      audio.pause();
+      audio.src = "";
+    };
+  }, []);
 
   function handleResetView() {
     //cancel any ongoing zoom/pan animation first
@@ -243,32 +255,6 @@ export default function NightScene({
           >
             <Moon position={[-3, 6.5, 1]} rotation={[0, -0.5, 0.5]} />
           </HoverMesh>
-
-          {/* Clouds */}
-          <Clouds path="/models/cloud1.glb" position={[3, 5, -3]} offset={0} />
-          <Clouds
-            path="/models/cloud2.glb"
-            position={[-1, 7, 5]}
-            offset={2}
-            rotation={[0, Math.PI / 8, 0]}
-          />
-          <Clouds
-            path="/models/cloud3.glb"
-            position={[-3, 4, -3]}
-            offset={3}
-            rotation={[0, Math.PI / -6, 0]}
-          />
-          <Clouds path="/models/cloud3.glb" position={[0, 9, 0]} offset={4} />
-          <Clouds
-            path="/models/cloud1.glb"
-            position={[0, 10, 5]}
-            offset={3.4}
-          />
-          <Clouds
-            path="/models/cloud2.glb"
-            position={[3, 6.6, -1]}
-            offset={0.5}
-          />
         </Suspense>
       </Canvas>
 

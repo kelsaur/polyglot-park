@@ -8,11 +8,13 @@ export function Clouds({
   position,
   offset = 0,
   rotation = [0, 0, 0],
+  hoverSound,
 }: {
   path: string;
   position: [number, number, number];
   offset?: number;
   rotation?: [number, number, number];
+  hoverSound?: string;
 }) {
   const ref = useRef<THREE.Group>(null);
   const { scene } = useGLTF(path);
@@ -23,12 +25,20 @@ export function Clouds({
       position[1] + Math.sin(clock.getElapsedTime() + offset) * 0.3;
   });
 
+  function playHoverSound() {
+    if (!hoverSound) return;
+    const audio = new Audio(hoverSound);
+    audio.volume = 0.4;
+    audio.play();
+  }
+
   return (
     <primitive
       ref={ref}
       object={scene.clone()}
       position={position}
       rotation={rotation}
+      onPointerOver={playHoverSound}
     />
   );
 }
