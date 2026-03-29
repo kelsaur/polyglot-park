@@ -24,13 +24,13 @@ import {
   Tent,
   Moon,
 } from "./Models";
-import { Clouds } from "./Clouds";
 import { ParkScene } from "./ParkScene";
 import { Suspense } from "react";
 import ProgressBar from "../ui/ProgressBar";
 import { NIGHT_VOCABULARY } from "../../data/vocabulary";
 import CompletionPopup from "../ui/CompletionPopup";
 import { Fireflies } from "./Fireflies";
+import { Stars } from "./Stars";
 
 const TOTAL_WORDS = Object.keys(NIGHT_VOCABULARY).length;
 const INITIAL_ZOOM = 60;
@@ -193,6 +193,15 @@ export default function NightScene({
             decay={2}
           />
 
+          {/* Point light 9 - moon*/}
+          <pointLight
+            position={[-3, 6.5, 2]}
+            intensity={1}
+            color="#ffffaa"
+            decay={1}
+            distance={5}
+          />
+
           {/* models */}
           <ParkScene />
           <Bench />
@@ -205,6 +214,7 @@ export default function NightScene({
           <Tree />
 
           <Fireflies count={10} />
+          <Stars count={300} />
 
           {/* interactive models */}
           <HoverMesh
@@ -253,7 +263,11 @@ export default function NightScene({
             isVisited={visited.has("moon")}
             isAnySelected={!!selected || showCompletion}
           >
-            <Moon position={[-3, 6.5, 1]} rotation={[0, -0.5, 0.5]} />
+            <Moon
+              position={[-3, 6.5, 1]}
+              rotation={[0, -0.5, 0.5]}
+              scale={[1.5, 1.5, 1.5]}
+            />
           </HoverMesh>
         </Suspense>
       </Canvas>

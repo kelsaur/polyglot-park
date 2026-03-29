@@ -73,13 +73,22 @@ function Tent() {
 function Moon({
   position,
   rotation = [0, 0, 0],
+  scale,
 }: {
   position: [number, number, number];
   rotation?: [number, number, number];
+  scale?: [number, number, number];
 }) {
   const { scene } = useGLTF("/models/moon.glb");
 
-  return <primitive object={scene} position={position} rotation={rotation} />;
+  return (
+    <primitive
+      object={scene}
+      position={position}
+      rotation={rotation}
+      scale={scale}
+    />
+  );
 }
 
 export {
