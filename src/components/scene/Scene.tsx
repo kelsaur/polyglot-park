@@ -1,52 +1,34 @@
 import * as THREE from "three";
-import { Canvas } from "@react-three/fiber";
-import { Environment, OrbitControls } from "@react-three/drei";
 import type { JSX } from "react";
 import type { OrbitControls as OrbitControlsImpl } from "three-stdlib";
-import { useRef, useState, useEffect } from "react";
-import "../../styles/Scene.css";
-import { WordOverlay } from "../ui/WordOverlay";
-import { HoverMesh } from "../helpers/HoverMesh";
-import { ClickToFocus } from "../ui/ClickToFocus";
-import {
-  Bench,
-  Canoe,
-  Fence,
-  Flowers,
-  Lake,
-  Mushrooms,
-  Stone,
-  Tree,
-  Path,
-  Frog,
-  Deer,
-  Owl,
-  Campfire,
-  Tent,
-  Moon,
-} from "./Models";
-import { Clouds } from "./Clouds";
-import { ParkScene } from "./ParkScene";
-import { Suspense } from "react";
-import ProgressBar from "../ui/ProgressBar";
+import { Canvas } from "@react-three/fiber";
+import { useRef, useState, useEffect, Suspense } from "react";
+import { Environment, OrbitControls } from "@react-three/drei";
 import { DAY_VOCABULARY, NIGHT_VOCABULARY } from "../../data/vocabulary";
+import "../../styles/Scene.css";
+import ProgressBar from "../ui/ProgressBar";
 import CompletionPopup from "../ui/CompletionPopup";
-import { Fireflies } from "./Fireflies";
-import { Stars } from "./Stars";
+import { WordOverlay } from "../ui/WordOverlay";
+import { ClickToFocus } from "../ui/ClickToFocus";
+import { Lake, ParkScene } from "./models/Models";
+import { DayModels } from "./models/DayModels";
+import { NightModels } from "./models/NightModels";
 
 const INITIAL_ZOOM = 60;
 const INITIAL_TARGET = new THREE.Vector3(0.05, 2, 0);
 const INITIAL_POSITION = new THREE.Vector3(10, 10, 10);
 
+interface SceneProps {
+  isNight: boolean;
+  onNightMode: () => void;
+  onStartOver: () => void;
+}
+
 export default function Scene({
   isNight,
   onNightMode,
   onStartOver,
-}: {
-  isNight: boolean;
-  onNightMode: () => void;
-  onStartOver: () => void;
-}): JSX.Element {
+}: SceneProps): JSX.Element {
   const controlsRef = useRef<OrbitControlsImpl>(null);
   const cancelFocusRef = useRef<(() => void) | null>(null);
   const [selected, setSelected] = useState<string | null>(null);
@@ -91,6 +73,7 @@ export default function Scene({
     controls.update();
   }
 
+  //mark word as visited, check if all words are found, and close word overlay
   function handleClose() {
     if (selected) {
       const newVisited = new Set(visited).add(selected);
@@ -118,7 +101,9 @@ export default function Scene({
           far: 1000,
         }}
       >
+        {/* suspend rendering until all GLB models are loaded */}
         <Suspense fallback={null}>
+          {/* camera controls - rotate, zoom, pan */}
           <OrbitControls
             ref={controlsRef}
             target={INITIAL_TARGET.toArray()}
@@ -129,14 +114,14 @@ export default function Scene({
             maxPolarAngle={Math.PI / 2.5}
           />
 
+          {/* double click to zoom and focus */}
           <ClickToFocus controlsRef={controlsRef} cancelRef={cancelFocusRef} />
-
           {/* shared lighting */}
           <ambientLight intensity={isNight ? 1 : 0.5} />
+          {/* environment lighting */}
           <Environment
             files={isNight ? "/hdri/hdr-night.hdr" : "/hdri/hdr-day.hdr"}
           />
-
           {/* day lighting */}
           {!isNight && (
             <>
@@ -167,7 +152,6 @@ export default function Scene({
               />
             </>
           )}
-
           {/* night lighting */}
           {isNight && (
             <>
@@ -229,184 +213,29 @@ export default function Scene({
               />
             </>
           )}
-
           {/* shared models */}
           <ParkScene />
           <Lake />
-
-          {/* day only */}
+          {/* day only models*/}
           {!isNight && (
             <>
-              <HoverMesh
-                word="bench"
+              <DayModels
+                selected={selected}
+                showCompletion={showCompletion}
+                visited={visited}
                 onSelect={setSelected}
-                isVisited={visited.has("bench")}
-                isAnySelected={!!selected || showCompletion}
-              >
-                <Bench />
-              </HoverMesh>
-              <HoverMesh
-                word="canoe"
-                onSelect={setSelected}
-                isVisited={visited.has("canoe")}
-                isAnySelected={!!selected || showCompletion}
-              >
-                <Canoe />
-              </HoverMesh>
-              <HoverMesh
-                word="fence"
-                onSelect={setSelected}
-                isVisited={visited.has("fence")}
-                isAnySelected={!!selected || showCompletion}
-              >
-                <Fence />
-              </HoverMesh>
-              <HoverMesh
-                word="flowers"
-                onSelect={setSelected}
-                isVisited={visited.has("flowers")}
-                isAnySelected={!!selected || showCompletion}
-              >
-                <Flowers />
-              </HoverMesh>
-              <HoverMesh
-                word="mushrooms"
-                onSelect={setSelected}
-                isVisited={visited.has("mushrooms")}
-                isAnySelected={!!selected || showCompletion}
-              >
-                <Mushrooms />
-              </HoverMesh>
-              <HoverMesh
-                word="stone"
-                onSelect={setSelected}
-                isVisited={visited.has("stone")}
-                isAnySelected={!!selected || showCompletion}
-              >
-                <Stone />
-              </HoverMesh>
-              <HoverMesh
-                word="tree"
-                onSelect={setSelected}
-                isVisited={visited.has("tree")}
-                isAnySelected={!!selected || showCompletion}
-              >
-                <Tree />
-              </HoverMesh>
-              <HoverMesh
-                word="path"
-                onSelect={setSelected}
-                isVisited={visited.has("path")}
-                isAnySelected={!!selected || showCompletion}
-              >
-                <Path />
-              </HoverMesh>
-              <Clouds
-                path="/models/cloud1.glb"
-                position={[3, 5, -3]}
-                offset={0}
-                hoverSound="/audio/wind.mp3"
-              />
-              <Clouds
-                path="/models/cloud2.glb"
-                position={[-1, 7, 5]}
-                offset={2}
-                rotation={[0, Math.PI / 8, 0]}
-              />
-              <Clouds
-                path="/models/cloud3.glb"
-                position={[-3, 4, -3]}
-                offset={3}
-                rotation={[0, Math.PI / -6, 0]}
-                hoverSound="/audio/wind.mp3"
-              />
-              <Clouds
-                path="/models/cloud3.glb"
-                position={[0, 9, 0]}
-                offset={4}
-              />
-              <Clouds
-                path="/models/cloud1.glb"
-                position={[0, 10, 5]}
-                offset={3.4}
-              />
-              <Clouds
-                path="/models/cloud2.glb"
-                position={[3, 6.6, -1]}
-                offset={0.5}
-                hoverSound="/audio/wind.mp3"
               />
             </>
           )}
-
-          {/* night only */}
+          {/* night only models */}
           {isNight && (
             <>
-              {/* night environment */}
-              <Stars count={300} />
-              <Fireflies count={10} />
-              {/* non-interactive day models still visible at night */}
-              <Bench />
-              <Canoe />
-              <Fence />
-              <Flowers />
-              <Mushrooms />
-              <Stone />
-              <Tree />
-
-              {/* night interactive models */}
-              <HoverMesh
-                word="frog"
+              <NightModels
+                selected={selected}
+                showCompletion={showCompletion}
+                visited={visited}
                 onSelect={setSelected}
-                isVisited={visited.has("frog")}
-                isAnySelected={!!selected || showCompletion}
-              >
-                <Frog />
-              </HoverMesh>
-              <HoverMesh
-                word="deer"
-                onSelect={setSelected}
-                isVisited={visited.has("deer")}
-                isAnySelected={!!selected || showCompletion}
-              >
-                <Deer />
-              </HoverMesh>
-              <HoverMesh
-                word="owl"
-                onSelect={setSelected}
-                isVisited={visited.has("owl")}
-                isAnySelected={!!selected || showCompletion}
-              >
-                <Owl />
-              </HoverMesh>
-              <HoverMesh
-                word="campfire"
-                onSelect={setSelected}
-                isVisited={visited.has("campfire")}
-                isAnySelected={!!selected || showCompletion}
-              >
-                <Campfire />
-              </HoverMesh>
-              <HoverMesh
-                word="tent"
-                onSelect={setSelected}
-                isVisited={visited.has("tent")}
-                isAnySelected={!!selected || showCompletion}
-              >
-                <Tent />
-              </HoverMesh>
-              <HoverMesh
-                word="moon"
-                onSelect={setSelected}
-                isVisited={visited.has("moon")}
-                isAnySelected={!!selected || showCompletion}
-              >
-                <Moon
-                  position={[-3, 6.5, 1]}
-                  rotation={[0, -0.5, 0.5]}
-                  scale={[1.5, 1.5, 1.5]}
-                />
-              </HoverMesh>
+              />
             </>
           )}
         </Suspense>

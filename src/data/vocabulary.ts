@@ -1,7 +1,12 @@
-export const DAY_VOCABULARY: Record<
-  string,
-  { estonian: string; english: string; audio?: string }
-> = {
+export interface VocabularyEntry {
+  estonian: string;
+  english: string;
+  audio?: string;
+}
+
+export type Vocabulary = Record<string, VocabularyEntry>;
+
+export const DAY_VOCABULARY: Vocabulary = {
   bench: {
     estonian: "pink",
     english: "bench",
@@ -44,10 +49,7 @@ export const DAY_VOCABULARY: Record<
   },
 };
 
-export const NIGHT_VOCABULARY: Record<
-  string,
-  { estonian: string; english: string; audio?: string }
-> = {
+export const NIGHT_VOCABULARY: Vocabulary = {
   frog: {
     estonian: "konn",
     english: "frog",

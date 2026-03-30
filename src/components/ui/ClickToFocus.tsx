@@ -3,13 +3,12 @@ import { useRef, useEffect } from "react";
 import { useFrame } from "@react-three/fiber";
 import type { OrbitControls as OrbitControlsImpl } from "three-stdlib";
 
-export function ClickToFocus({
-  controlsRef,
-  cancelRef,
-}: {
+interface ClickToFocusPorps {
   controlsRef: React.RefObject<OrbitControlsImpl | null>;
   cancelRef?: React.RefObject<(() => void) | null>;
-}) {
+}
+
+export function ClickToFocus({ controlsRef, cancelRef }: ClickToFocusPorps) {
   const zoomRef = useRef<number | null>(null);
   const targetRef = useRef<THREE.Vector3 | null>(null);
 

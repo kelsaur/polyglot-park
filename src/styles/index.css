@@ -25,3 +25,11 @@ h3 {
   font-family: "Righteous", sans-serif;
   font-weight: 400;
 }
+
+:root {
+  --color-green: #2ecc8a;
+  --color-blue: #2a7abf;
+  --color-bg-warm: #f7f5f0;
+  --color-text-dark: #1a1a1a;
+  --color-text-muted: #888;
+}

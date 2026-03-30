@@ -1,4 +1,4 @@
-import "../../styles/CompletionPopup.css";
+import "./CompletionPopup.css";
 
 interface CompletionPopupProps {
   onNightMode?: () => void;

@@ -3,6 +3,15 @@ import { useState, useEffect, useRef } from "react";
 import { useFrame } from "@react-three/fiber";
 import { Html } from "@react-three/drei";
 
+interface HoverMeshProps {
+  children: React.ReactNode;
+  hitPadding?: number;
+  word: string;
+  onSelect: (word: string) => void;
+  isVisited?: boolean;
+  isAnySelected?: boolean;
+}
+
 export function HoverMesh({
   children,
   hitPadding = 0.01,
@@ -10,14 +19,7 @@ export function HoverMesh({
   onSelect,
   isVisited = false,
   isAnySelected = false,
-}: {
-  children: React.ReactNode;
-  hitPadding?: number;
-  word: string;
-  onSelect: (word: string) => void;
-  isVisited?: boolean;
-  isAnySelected?: boolean;
-}) {
+}: HoverMeshProps) {
   const ref = useRef<THREE.Group>(null);
   const hitRef = useRef<THREE.Mesh>(null);
   const initialized = useRef(false);
@@ -53,7 +55,7 @@ export function HoverMesh({
     };
   }, [hovered]);
 
-  //smooth scale + emissive
+  //smooth scale + emissive material
   useFrame(() => {
     if (!ref.current) return;
 
