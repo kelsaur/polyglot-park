@@ -3,19 +3,21 @@ import { useRef } from "react";
 import { useGLTF } from "@react-three/drei";
 import { useFrame } from "@react-three/fiber";
 
+interface CloudsProps {
+  path: string;
+  position: [number, number, number];
+  offset?: number;
+  rotation?: [number, number, number];
+  hoverSound?: string;
+}
+
 export function Clouds({
   path,
   position,
   offset = 0,
   rotation = [0, 0, 0],
   hoverSound,
-}: {
-  path: string;
-  position: [number, number, number];
-  offset?: number;
-  rotation?: [number, number, number];
-  hoverSound?: string;
-}) {
+}: CloudsProps) {
   const ref = useRef<THREE.Group>(null);
   const { scene } = useGLTF(path);
 

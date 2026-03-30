@@ -1,10 +1,10 @@
+import type { Vocabulary } from "../../data/vocabulary";
+import "./WordOverlay.css";
+
 interface WordOverlayProps {
   word: string;
   onClose: () => void;
-  vocabulary: Record<
-    string,
-    { estonian: string; english: string; audio?: string }
-  >;
+  vocabulary: Vocabulary;
 }
 
 export function WordOverlay({ word, onClose, vocabulary }: WordOverlayProps) {

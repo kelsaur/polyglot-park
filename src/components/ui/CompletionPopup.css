@@ -4,16 +4,17 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 1;
+  z-index: 20;
+  padding: 1rem;
 }
 
 .completion-card {
-  background: #f7f5f0;
+  background: var(--color-bg-warm);
   border-radius: 1.5rem;
   padding: 2.5rem 3rem;
   text-align: center;
+  width: 90%;
   max-width: 340px;
-  width: 100%;
   box-shadow: 0 1rem 3rem rgba(0, 0, 0, 0.15);
   animation: popIn 0.4s ease forwards;
 }
@@ -21,9 +22,11 @@
 @keyframes popIn {
   from {
     opacity: 0;
+    transform: scale(0.95);
   }
   to {
     opacity: 1;
+    transform: scale(1);
   }
 }
 
@@ -35,19 +38,19 @@
 .completion-title {
   font-size: 1.75rem;
   font-weight: 400;
-  color: #1a1a1a;
+  color: var(--color-text-dark);
   margin: 0 0 0.5rem;
 }
 
 .completion-description {
   font-size: 0.9rem;
-  color: #888;
+  color: var(--color-text-muted);
   margin: 0 0 2rem;
   line-height: 1.6;
 }
 
 .completion-startover-btn {
-  background: #2ecc8a;
+  background: var(--color-green);
   color: white;
   border: none;
   border-radius: 2rem;
@@ -63,4 +66,18 @@
 
 .completion-startover-btn:hover {
   background: #26b87b;
+}
+
+.completion-keep-btn {
+  background: none;
+  border: none;
+  font-size: 0.85rem;
+  color: #aaa;
+  cursor: pointer;
+  padding: 0.5rem;
+  font-family: inherit;
+}
+
+.completion-keep-btn:hover {
+  color: var(--color-text-muted);
 }

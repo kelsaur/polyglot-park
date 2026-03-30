@@ -1,16 +1,19 @@
 .start-wrapper {
-  position: absolute;
+  position: fixed;
   inset: 0;
   display: flex;
   align-items: center;
   justify-content: center;
   z-index: 10;
-  background-color: #f7f5f0;
+  background-color: var(--color-bg-warm);
+  overflow: hidden;
 }
 
 .start-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
   text-align: center;
-  max-width: 520px;
   width: 100%;
   padding: 2rem;
   animation: fadeIn 0.8s ease forwards;
@@ -34,28 +37,28 @@
 }
 
 .start-title {
-  font-size: 4rem;
+  font-size: clamp(2rem, 8vw, 4rem);
   font-weight: 400;
-  color: #1a1a1a;
+  color: var(--color-text-dark);
   margin: 0 0 1rem;
   letter-spacing: 1px;
   line-height: 1;
 }
 
 .start-description {
-  font-size: 1rem;
-  color: #888;
+  font-size: clamp(0.875rem, 2vw, 1rem);
+  color: var(--color-text-muted);
   margin: 0 0 2.5rem;
   line-height: 1.6;
 }
 
 .start-button {
-  background: #2ecc8a;
+  background: var(--color-green);
   color: white;
   border: none;
   border-radius: 2rem;
   padding: 0.875rem 2.5rem;
-  font-size: 1rem;
+  font-size: clamp(0.875rem, 2vw, 1rem);
   font-weight: 600;
   cursor: pointer;
   margin-bottom: 3rem;
@@ -72,6 +75,21 @@
   padding-top: 1.5rem;
 }
 
+.start-controls-grid {
+  width: 70%;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.75rem 2rem;
+  margin: 0 auto;
+}
+
+.start-control-item {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
 .start-controls-label {
   font-size: 0.7rem;
   color: #bbb;
@@ -79,19 +97,6 @@
   letter-spacing: 1.5px;
   font-weight: 600;
   margin: 0 0 1rem;
-}
-
-.start-controls-row {
-  display: flex;
-  justify-content: center;
-  gap: 2rem;
-  margin-bottom: 0.6rem;
-}
-
-.start-control-item {
-  display: flex;
-  align-items: center;
-  gap: 0.6rem;
 }
 
 .start-control-item kbd {
@@ -104,7 +109,7 @@
   white-space: nowrap;
   font-family: inherit;
   border: none;
-  min-width: 5rem;
+  min-width: 4rem;
   text-align: center;
 }
 

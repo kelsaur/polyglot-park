@@ -1,0 +1,58 @@
+.overlay-backdrop {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1;
+}
+
+.overlay-card {
+  background: white;
+  border-radius: 1rem;
+  padding: 2rem 3rem;
+  text-align: center;
+  box-shadow: 0 0.5rem 2rem rgba(0, 0, 0, 0.4);
+  min-width: 200px;
+  max-width: 320px;
+  width: fit-content;
+}
+
+.overlay-estonian {
+  font-size: 2.25rem;
+  font-weight: bold;
+  margin: 0 0 0.5rem;
+  color: var(--color-text-dark);
+}
+
+.overlay-english {
+  font-size: 1.125rem;
+  color: var(--color-text-muted);
+  margin: 0 0 1.5rem;
+}
+
+.overlay-audio {
+  background: none;
+  border: 1px solid #ddd;
+  border-radius: 0.5rem;
+  padding: 0.5rem 1.25rem;
+  cursor: pointer;
+  font-size: 1.25rem;
+  margin-bottom: 0.75rem;
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.overlay-close {
+  background: none;
+  border: 1px solid #ddd;
+  border-radius: 0.5rem;
+  padding: 0.5rem 1.25rem;
+  cursor: pointer;
+  font-size: 0.875rem;
+  color: #999;
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+}

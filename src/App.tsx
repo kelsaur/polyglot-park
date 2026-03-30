@@ -1,8 +1,6 @@
-import "./index.css";
 import { useState } from "react";
 import StartScreen from "./components/ui/StartScreen";
-import DayScene from "./components/scene/DayScene";
-import NightScene from "./components/scene/NightScene";
+import Scene from "./components/scene/Scene";
 
 export default function App() {
   const [started, setStarted] = useState(false);
@@ -13,9 +11,10 @@ export default function App() {
   }
 
   if (!started) return <StartScreen onStart={() => setStarted(true)} />;
-  if (isNight) return <NightScene onStartOver={handleStartOver} />;
+
   return (
-    <DayScene
+    <Scene
+      isNight={isNight}
       onNightMode={() => setIsNight(true)}
       onStartOver={handleStartOver}
     />
